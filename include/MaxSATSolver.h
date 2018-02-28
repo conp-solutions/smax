@@ -33,6 +33,15 @@ static_assert(sizeof(uint64_t) == 8, "The library will assume that 'int64_t' rep
  */
 class DLL_PUBLIC MaxSATSolver {
   
+    /** Allow class to point to some (arbitrary) data */
+    void* externalData;
+
+    /** Explicitly disallow copy constructors */
+    MaxSATSolver(const MaxSATSolver& other) = delete;
+
+    /** Explicitly disallow copy operator */
+    MaxSATSolver& operator=(MaxSATSolver const&) = delete;
+  
 public:
 
     /** Return codes for the caller to compute a MaxSAT solution
