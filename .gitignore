@@ -2,6 +2,7 @@
 *.od
 *.or
 *.os
+*.ol
 *.o
 *.a
 depend.mk
