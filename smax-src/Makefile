@@ -4,7 +4,7 @@
 #
 
 # setup the solver to be used as a single variable
-SOLVER ?= minisat2.2
+SOLVER ?= minisat
 
 # include the solver.mk file from the solvers directory
 include ../open-wbo/solvers/$(SOLVER).mk
