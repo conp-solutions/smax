@@ -35,14 +35,12 @@ OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWA
 
 #include "include/MaxSATSolver.h"
 
-// #include "smax-src/GDimacs.h"
+#include "smax-src/WDimacs.h"
 
-// using namespace SMax;
+using namespace SMax;
 using namespace NSPACE;
 
 //=================================================================================================
-
-static const char* _certified = "CORE -- CERTIFIED UNSAT";
 
 static MaxSATSolver* solver;
 // Terminate by notifying the solver and back out gracefully. This is mainly to have a test-case
@@ -66,7 +64,7 @@ static void SIGINT_exit(int signum) {
 int main(int argc, char** argv)
 {
 
-      printf("c\nc This is smoother -- based on glucose 4.0 and on MiniSAT\nc\n");
+      printf("c\nc This is smax -- based on MiniSAT\nc\n");
       
       setUsageHelp("c USAGE: %s [options] <input-file> <result-output-file>\n\n  where input may be either in plain or gzipped GDIMACS.\n");
         
@@ -80,18 +78,18 @@ int main(int argc, char** argv)
         //
         IntOption    verb   ("MAIN", "verb",   "Verbosity level (0=silent, 1=some, 2=more).", 1, IntRange(0, 2));
         BoolOption   mod   ("MAIN", "model",   "show model.", false);
-        IntOption    vv  ("MAIN", "vv",   "Verbosity every vv conflicts", 10000, IntRange(1,INT32_MAX));
+        IntOption    vv  ("MAIN", "vv",   "Verbosity every vv conflicts", 10000, IntRange(1, INT32_MAX));
         BoolOption   pre    ("MAIN", "pre",    "Completely turn on/off any preprocessing.", true);
-        StringOption dimacs ("MAIN", "dimacs", "If given, stop after preprocessing and write the result to this file.");
         IntOption    cpu_lim("MAIN", "cpu-lim","Limit on CPU time allowed in seconds.\n", INT32_MAX, IntRange(0, INT32_MAX));
         IntOption    mem_lim("MAIN", "mem-lim","Limit on memory usage in megabytes.\n", INT32_MAX, IntRange(0, INT32_MAX));
 
+	IntOption    maxMinimizeSteps("SMAX", "maxSteps","Limit number of conflicts per SAT call.\n", -1, IntRange(-1, INT32_MAX));
+
         parseOptions(argc, argv, true);
         
-        MaxSATSolver S(100);
+        MaxSATSolver *S;
         double      initial_time = cpuTime();
 
-        solver = &S;
         // Use signal handlers that forcibly quit until the solver will be able to respond to
         // interrupts:
         signal(SIGINT, SIGINT_exit);
@@ -126,14 +124,13 @@ int main(int argc, char** argv)
         if (in == NULL)
             printf("ERROR! Could not open file: %s\n", argc == 1 ? "<stdin>" : argv[1]), exit(1);
         
-	return 0;
-#if 0
+
     try {
-	
-        parse_GDIMACS<SmootherSolver>(in, S);
+	int64_t top_weight;
+        S = parse_WDIMACS(in, top_weight);
+        solver = S;
         gzclose(in);
 
-        printf("c parsed %d vars, %d groups\n", S.nVars(), S.newGroup());
         double parsed_time = cpuTime();
         printf("c parse time:           %12.2f s\n", parsed_time - initial_time);
 
@@ -142,49 +139,35 @@ int main(int argc, char** argv)
         signal(SIGINT, SIGINT_interrupt);
         signal(SIGXCPU,SIGINT_interrupt);
 
-	std::vector< std::vector<int> > muses;
-	MUSSolver::ReturnCode mus_ret;
-	if(!opt_disjunct_cores){
-	  muses.push_back(std::vector<int>());
-	  mus_ret = S.compute_mus(muses[0]);
-	}
-	else
-	{
-	  mus_ret = S.compute_disjunct_muses(muses);
-	}
+	std::vector<int> model;
+	
+	MaxSATSolver::ReturnCode maxsat_ret;
+	maxsat_ret = S->compute_maxsat(model, top_weight < 0 ? UINT64_MAX : top_weight, 0, maxMinimizeSteps);
 
 	int retStatus = 0;
-	switch(mus_ret) {
-	case MUSSolver::ReturnCode::UNSATISFIABLE:
-	case MUSSolver::ReturnCode::OPTIMAL:
-	case MUSSolver::ReturnCode::UNKNOWN:
-	  if(mus_ret == MUSSolver::ReturnCode::UNKNOWN && muses.size() == 0 || (!opt_disjunct_cores && muses[0].size() == 0)) {
+	switch(maxsat_ret) {
+	case MaxSATSolver::ReturnCode::UNSATISFIABLE:
+	  printf("s UNSATISFIABLE\n");
+	  retStatus = 20;
+	  break;
+	case MaxSATSolver::ReturnCode::OPTIMAL:
+	case MaxSATSolver::ReturnCode::UNKNOWN:
+	  if(maxsat_ret == MaxSATSolver::ReturnCode::UNKNOWN && model.size() == 0) {
 	    printf("s UNKNOWN\n");
 	    break;
 	  }
-	  printf("c found MUS, %lu mus(es)\n", muses.size());
-	  printf("s UNSATISFIABLE\n");
-	  if(mus_ret == MUSSolver::ReturnCode::OPTIMAL) printf("s OPTIMAL\n");
-	  else printf("s UNSATISFIABLE\n");
-	  for (unsigned index = 0 ; index < muses.size(); ++index)
-	  {
-	    printf("c MUS %u (size %lu)\n", index, muses[index].size());
-	    printf("v ");
-	    for(unsigned i = 0; i < muses[index].size(); ++ i) printf("%d ", muses[index][i]);
-	    printf("0\n");
-	  }
-	  retStatus = 20;
-	  break;
-	case MUSSolver::ReturnCode::SATISFIABLE:
-	  printf("c found model with %lu variables.\n", S.model.size());
-	  printf("s SATISFIABLE\n");
+	  /* print S line */
+	  if(maxsat_ret == MaxSATSolver::ReturnCode::OPTIMAL) printf("s OPTIMAL\n");
+	  else printf("s SATISFIABLE\n"); /* even if unknown, as we already found a model */
+	  
+	  /* print model */
 	  printf("v ");
-	  for(unsigned index = 1; index < S.model.size(); ++ index)
-	    printf("%d ", S.model[index]);
+	  for(unsigned index = 1; index < model.size(); ++ index)
+	    printf("%d ", model[index]);
 	  printf("0\n");
 	  retStatus = 10;
 	  break;
-	case MUSSolver::ReturnCode::ERROR:
+	case MaxSATSolver::ReturnCode::ERROR:
 	default:
 	  printf("s ERROR\n");
 	  printf("c some error occurred, abort\n");
@@ -198,8 +181,8 @@ int main(int argc, char** argv)
         return retStatus;
     } catch (OutOfMemoryException&){
 	        printf("c =========================================================================================================\n");
-        printf("INDETERMINATE\n");
+        printf("s UNKNOWN\n");
         exit(0);
     }
-#endif
+
 }
