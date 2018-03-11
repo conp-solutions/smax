@@ -14,7 +14,7 @@ EXEC       = smax
 LIB        = smax
 DEPDIR     = mtl utils core simp
 # from open-wbo
-DEPDIR     +=  ../../encodings ../../algorithms ../../graph ../../classifier
+DEPDIR     +=  ../open-wbo/encodings ../open-wbo/algorithms ../open-wbo/graph ../open-wbo/classifier
 
 
 MROOT      = $(PWD)/../open-wbo/solvers/$(SOLVERDIR)
