@@ -12,14 +12,24 @@ include ../open-wbo/solvers/$(SOLVER).mk
 # THE REMAINING OF THE MAKEFILE SHOULD BE LEFT UNCHANGED
 EXEC       = smax
 LIB        = smax
+
+# from minisat
 DEPDIR     = mtl utils core simp
+
 # from open-wbo
-DEPDIR     +=  ../open-wbo/encodings ../open-wbo/algorithms ../open-wbo/graph ../open-wbo/classifier
+DEPDIR     += ../../../open-wbo
+DEPDIR     += ../../../open-wbo/encodings
+DEPDIR     += ../../../open-wbo/algorithms
+DEPDIR     += ../../../open-wbo/graph
+DEPDIR     += ../../../open-wbo/classifier
 
-
+# Point to minisat directory
 MROOT      = $(PWD)/../open-wbo/solvers/$(SOLVERDIR)
-CFLAGS     = -I .. -Wall -Wno-parentheses -std=c++11 -DNSPACE=$(NSPACE) -DSOLVERNAME=$(SOLVERNAME) -DVERSION=$(VERSION)
-LFLAGS     = -Wall $(EXTRA_LFLAGS)
+
+# Set compile and link flags
+CFLAGS     += -I .. -Wall -Wno-parentheses -std=c++11 -DNSPACE=$(NSPACE) -DSOLVERNAME=$(SOLVERNAME) -DVERSION=$(VERSION)
+LFLAGS     += -lgmpxx -lgmp
+LFLAGS     += -Wall $(EXTRA_LFLAGS) 
 
 # Make sure, all classes that are not in the API are not present in the .so file (after strip -x)
 CFLAGS    += -fvisibility=hidden
