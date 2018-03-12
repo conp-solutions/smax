@@ -108,6 +108,21 @@ MaxSATSolver::ReturnCode MaxSATSolver::compute_maxsat(std::vector<int> &model,
                               const std::vector<int> *startAssignment,
                               int maxMinimizeSteps)
 {
-  return MaxSATSolver::ReturnCode::UNKNOWN; // not yet implemented
+  if(!externalData) return ERROR;
+  SMaxSolver *solver = (SMaxSolver*)externalData;
+  if(solver->getErrno() != 0 && solver->getErrno() != -EINVAL) return ERROR;
+  solver->setErrno(0);
+  
+  // try to run usual code, but catch exceptions if they happen
+  try {
+    // in case we got errors before, avoid computations without overwriting the error code
+    return solver->compute_maxsat(model, maxCost, startAssignment, maxMinimizeSteps);
+  }
+  catch (...)
+  {
+    // in case of the exception, set the error number
+    solver->setErrno(-ENOMEM);
+    return ERROR;
+  }
 }
 
