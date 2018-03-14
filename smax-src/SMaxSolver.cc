@@ -312,7 +312,7 @@ bool SMaxSolver::addAtMostK(const std::vector< int >& literals, unsigned int k)
   if(k == 0) addNegatedUnits(literals);
   else if(k == 1) addAtMostOne(literals);
   else {
-#warning switch to built-in PB constraint
+    // TODO switch to built-in PB constraint
     /*
     PB cardinalityConstraint;
     maxsat_formula->addPBConstraint(cardinalityConstraint);
@@ -367,6 +367,7 @@ MaxSATSolver::ReturnCode SMaxSolver::compute_maxsat(std::vector< int >& model, u
 
     if (((PartMSU3 *)S)->chooseAlgorithm() == _ALGORITHM_MSU3_) {
       // delete S;
+      // TODO there might be a memory leak here, check and fix!
       S = new MSU3(_VERBOSITY_MINIMAL_);
       // if(simplify_debug) std::cerr << "[SMAX] switch to MSU3" << std::endl;
     }
