@@ -6,4 +6,4 @@ CFLAGS    += -flto
 CFLAGS     += -Wextra -Wno-unused-parameter
 
 # Make sure we do not introduce warnings again
-# CFLAGS     += -Wno-literal-suffix -Werror
+CFLAGS     += -Wno-literal-suffix -Werror
