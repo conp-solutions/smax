@@ -129,17 +129,19 @@ int main(int argc, char** argv)
         gzclose(in);
 
         double parsed_time = cpuTime();
-        printf("c parse time:           %12.2f s\n", parsed_time - initial_time);
+        if(verb>0) printf("c parse time:           %12.2f s\n", parsed_time - initial_time);
 
         // Change to signal-handlers that will only notify the solver and allow it to terminate
         // voluntarily:
         signal(SIGINT, SIGINT_interrupt);
         signal(SIGXCPU,SIGINT_interrupt);
 
+	if(verb>0) printf("c start search with top weight %lu\n", top_weight < 0 ? UINT64_MAX : top_weight);
 	std::vector<int> model;
 	
 	MaxSATSolver::ReturnCode maxsat_ret;
 	maxsat_ret = S->compute_maxsat(model, top_weight < 0 ? UINT64_MAX : top_weight, 0, maxMinimizeSteps);
+	if(verb>0) printf("c return from search with status %d, and model size %lu\n", maxsat_ret, model.size());
 
 	int retStatus = 0;
 	switch(maxsat_ret) {
