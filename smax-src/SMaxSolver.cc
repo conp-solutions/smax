@@ -382,7 +382,7 @@ MaxSATSolver::ReturnCode SMaxSolver::compute_maxsat(std::vector< int >& model, u
 
   S->search();
   
-  openwbo::StatusCode ret = S->getStatus();
+  StatusCode ret = S->getStatus();
   
   /*
   if(ret == l_True) {
@@ -393,19 +393,19 @@ MaxSATSolver::ReturnCode SMaxSolver::compute_maxsat(std::vector< int >& model, u
   
   switch(ret)
   {
-    case openwbo::UNSATISFIABLE:
+    case _UNSATISFIABLE_:
       delete S; S = nullptr;
       return MaxSATSolver::ReturnCode::UNSATISFIABLE;
-    case openwbo::ERROR:
+    case _ERROR_:
       delete S; S = nullptr;
       return MaxSATSolver::ReturnCode::ERROR;
-    case openwbo::SATISFIABLE:
+    case _SATISFIABLE_:
       model.resize(inputVarCnt + 1, 0);
       for(Var v = 0; v < inputVarCnt; ++ v)
 	model[v+1] = S->getValue(v);
       delete S; S = nullptr;
       return MaxSATSolver::ReturnCode::SATISFIABLE;
-    case openwbo::OPTIMUM:
+    case _OPTIMUM_:
       model.resize(inputVarCnt + 1, 0);
       for(Var v = 0; v < inputVarCnt; ++ v)
 	model[v+1] = S->getValue(v);
