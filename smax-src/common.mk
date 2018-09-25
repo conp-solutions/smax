@@ -7,3 +7,6 @@ CFLAGS     += -Wextra -Wno-unused-parameter
 
 # Make sure we do not introduce warnings again
 CFLAGS     += -Wno-literal-suffix -Werror
+
+# Make sure we can handle flto
+AR = gcc-ar
