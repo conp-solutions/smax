@@ -177,10 +177,12 @@ int main(int argc, char** argv)
 	double mem_used = memUsedPeak();
 	printf("Stats: Memory : %.2f MB, CPU : %g s\n", mem_used, cpu_time);
 	
+        delete S;
         return retStatus;
     } catch (OutOfMemoryException&){
 	        printf("c =========================================================================================================\n");
         printf("s UNKNOWN\n");
+        delete S;
         exit(0);
     }
 
