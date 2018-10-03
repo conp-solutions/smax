@@ -131,7 +131,11 @@ SMaxSolver::SMaxSolver(const int inputVariables)
 
 SMaxSolver::~SMaxSolver()
 {
-
+    if(maxsat_formula)
+    {
+        delete maxsat_formula;
+        maxsat_formula = nullptr;
+    }
 }
 
 void SMaxSolver::reserveVars(unsigned int variables)
@@ -366,7 +370,7 @@ MaxSATSolver::ReturnCode SMaxSolver::compute_maxsat(std::vector< int >& model, u
     S->loadFormula(maxsat_formula);
 
     if (((PartMSU3 *)S)->chooseAlgorithm() == _ALGORITHM_MSU3_) {
-      // delete S;
+      delete S; // the new version will keep the formula around
       // TODO there might be a memory leak here, check and fix!
       S = new MSU3(_VERBOSITY_MINIMAL_);
       // if(simplify_debug) std::cerr << "[SMAX] switch to MSU3" << std::endl;
