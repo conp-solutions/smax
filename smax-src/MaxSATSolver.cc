@@ -20,6 +20,7 @@ const char* MaxSATSolver::getSolverName () const
 }
 
 MaxSATSolver::MaxSATSolver(int nVars, int nClausesEstimate)
+: externalData(nullptr)
 {
   // try to run usual code, but catch exceptions if they happen
   try {
