@@ -50,6 +50,11 @@ MaxSATSolver::~MaxSATSolver()
   externalData = nullptr;
 }
 
+unsigned MaxSATSolver::getVersion () const
+{
+  return 1; // this is the first version of the interface
+}
+
 int MaxSATSolver::getErrno() const
 {
   if(!externalData) return -ENOMEM;
