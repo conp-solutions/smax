@@ -1,9 +1,9 @@
 all: libs smax
 
 libs:
-	cd smax-src; make libl
+	cd smax-src; make libL
 	mkdir -p lib
-	cp smax-src/libsmax_standard.so lib/libsmax.so
+	cp smax-src/libsmax_debug.so lib/libsmax.so
 	cd smax-src; make libd
 	cp smax-src/libsmax_debug.a lib/libsmax.a
 
