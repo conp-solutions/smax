@@ -140,7 +140,8 @@ int main(int argc, char** argv)
 	std::vector<int> model;
 	
 	MaxSATSolver::ReturnCode maxsat_ret;
-	maxsat_ret = S->compute_maxsat(model, top_weight < 0 ? UINT64_MAX : top_weight, 0, maxMinimizeSteps);
+	uint64_t cost = ~0UL;
+	maxsat_ret = S->compute_maxsat(model, cost, top_weight < 0 ? UINT64_MAX : top_weight, 0, maxMinimizeSteps);
 	if(verb>0) printf("c return from search with status %d, and model size %lu\n", maxsat_ret, model.size());
 
 	int retStatus = 0;
@@ -156,7 +157,7 @@ int main(int argc, char** argv)
 	    break;
 	  }
 	  /* print S line */
-	  if(maxsat_ret == MaxSATSolver::ReturnCode::OPTIMAL) printf("s OPTIMAL\n");
+	  if(maxsat_ret == MaxSATSolver::ReturnCode::OPTIMAL) printf("s OPTIMAL\no %" PRIu64 "\n", cost);
 	  else printf("s SATISFIABLE\n"); /* even if unknown, as we already found a model */
 	  
 	  /* print model */

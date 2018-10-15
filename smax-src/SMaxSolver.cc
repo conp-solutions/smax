@@ -329,8 +329,10 @@ bool SMaxSolver::addAtMostK(const std::vector< int >& literals, unsigned int k)
 }
 
 
-MaxSATSolver::ReturnCode SMaxSolver::compute_maxsat(std::vector< int >& model, uint64_t maxCost, const std::vector< int >* startAssignment, int maxMinimizeSteps)
+MaxSATSolver::ReturnCode SMaxSolver::compute_maxsat(std::vector< int >& model, uint64_t &cost, uint64_t maxCost, const std::vector< int >* startAssignment, int maxMinimizeSteps)
 {
+  cost = UINT64_MAX;
+
   // check environment
   if(maxsat_formula == nullptr) {
     setErrno(-EINVAL);
@@ -404,12 +406,14 @@ MaxSATSolver::ReturnCode SMaxSolver::compute_maxsat(std::vector< int >& model, u
       delete S; S = nullptr;
       return MaxSATSolver::ReturnCode::ERROR;
     case _SATISFIABLE_:
+      cost = S->getLastBound();
       model.resize(inputVarCnt + 1, 0);
       for(Var v = 0; v < inputVarCnt; ++ v)
 	model[v+1] = S->getValue(v);
       delete S; S = nullptr;
       return MaxSATSolver::ReturnCode::SATISFIABLE;
     case _OPTIMUM_:
+      cost = S->getLastBound();
       model.resize(inputVarCnt + 1, 0);
       for(Var v = 0; v < inputVarCnt; ++ v)
 	model[v+1] = S->getValue(v);

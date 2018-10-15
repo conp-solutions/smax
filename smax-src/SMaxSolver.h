@@ -140,7 +140,8 @@ protected:
      *  Implements the method from the MaxSATSolver.h interface
      */
     MaxSATSolver::ReturnCode compute_maxsat(std::vector<int> &model,
-                              uint64_t maxCost = UINT64_MAX,
+                              uint64_t &cost,
+                              uint64_t maxCost = INT64_MAX,
                               const std::vector<int> *startAssignment = 0,
                               int maxMinimizeSteps = -1);
 

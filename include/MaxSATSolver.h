@@ -217,6 +217,7 @@ public:
      *  until completion.
      * 
      *  @param model stores the return result: (optimal) model, or empty
+     *  @param cost  stores the resulting cost, in case a model is reported
      *  @param maxCost maximal cost to accept a solution as solution
      *  @param startAssignment list of variable assignments to start with
      *         (optional, might help to speedup computation, invalid literals
@@ -234,6 +235,7 @@ public:
      *                   satisfying assignment with some cost could be found
      **/
     ReturnCode compute_maxsat(std::vector<int> &model,
+                              uint64_t &cost,
                               uint64_t maxCost = UINT64_MAX,
                               const std::vector<int> *startAssignment = 0,
                               int maxMinimizeSteps = -1);

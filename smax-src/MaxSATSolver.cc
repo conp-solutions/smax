@@ -104,6 +104,7 @@ bool MaxSATSolver::addAtMostK(const std::vector<int> &literals, const unsigned k
 }
     
 MaxSATSolver::ReturnCode MaxSATSolver::compute_maxsat(std::vector<int> &model,
+                              uint64_t & cost,
                               uint64_t maxCost,
                               const std::vector<int> *startAssignment,
                               int maxMinimizeSteps)
@@ -116,7 +117,7 @@ MaxSATSolver::ReturnCode MaxSATSolver::compute_maxsat(std::vector<int> &model,
   // try to run usual code, but catch exceptions if they happen
   try {
     // in case we got errors before, avoid computations without overwriting the error code
-    return solver->compute_maxsat(model, maxCost, startAssignment, maxMinimizeSteps);
+    return solver->compute_maxsat(model, cost, maxCost, startAssignment, maxMinimizeSteps);
   }
   catch (...)
   {
