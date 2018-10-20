@@ -113,7 +113,7 @@ MaxSATSolver::ReturnCode MaxSATSolver::compute_maxsat(std::vector<int> &model,
                               uint64_t & cost,
                               uint64_t maxCost,
                               const std::vector<int> *startAssignment,
-                              int maxMinimizeSteps)
+                              int64_t maxMinimizeSteps)
 {
   if(!externalData) return ERROR;
   SMaxSolver *solver = (SMaxSolver*)externalData;

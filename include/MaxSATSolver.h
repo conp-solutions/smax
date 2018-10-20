@@ -238,7 +238,7 @@ public:
                               uint64_t &cost,
                               uint64_t maxCost = UINT64_MAX,
                               const std::vector<int> *startAssignment = 0,
-                              int maxMinimizeSteps = -1);
+                              int64_t maxMinimizeSteps = -1);
 };
 
 #endif

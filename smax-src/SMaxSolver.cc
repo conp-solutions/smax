@@ -329,7 +329,7 @@ bool SMaxSolver::addAtMostK(const std::vector< int >& literals, unsigned int k)
 }
 
 
-MaxSATSolver::ReturnCode SMaxSolver::compute_maxsat(std::vector< int >& model, uint64_t &cost, uint64_t maxCost, const std::vector< int >* startAssignment, int maxMinimizeSteps)
+MaxSATSolver::ReturnCode SMaxSolver::compute_maxsat(vector< int >& model, uint64_t& cost, uint64_t maxCost, const vector< int >* startAssignment, int64_t maxMinimizeSteps)
 {
   cost = UINT64_MAX;
 
