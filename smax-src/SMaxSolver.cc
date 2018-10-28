@@ -170,6 +170,13 @@ void SMaxSolver::addClause(const NSPACE::vec< NSPACE::Lit >& literals, uint64_t 
     // set the top variable in the formula
     if(v >= maxsat_formula->nVars()) maxsat_formula->newVar(v+1);
   }
+
+  if(simplify_debug) {
+    std::cout << "add clause ";
+    if(weight>0) std::cout << "with weight " << weight;
+    for(int i = 0; i < literals.size(); ++ i) std::cout << (sign(literals[i]) ? -var(literals[i])-1 : var(literals[i]) + 1) << " ";
+    std::cout << std::endl;
+  }
   
   if(weight == 0)
   {
@@ -228,6 +235,7 @@ void SMaxSolver::encodeAtMosK_SWC(const std::vector< int >& lits, const int k)
   if(simplify_debug) std::cout << "c encode SWC for k==" << k << " and literals " << lits << std::endl;
   if(simplify_debug) std::cout << "c start with variable " << nVars() << std::endl;
   
+  if(simplify_debug) std::cout << "constraint (1):" << std::endl;
   // encode AMK, lazily add new variables
   // (1) from SWC paper:
   temporary_lits.clear();
@@ -242,6 +250,7 @@ void SMaxSolver::encodeAtMosK_SWC(const std::vector< int >& lits, const int k)
     }
   }
   
+  if(simplify_debug) std::cout << "constraint (2):" << std::endl;
   // (2) from paper
   for( int i = 0 ; i + 1 < n; ++ i ) {
     const int j = 0;
@@ -251,6 +260,7 @@ void SMaxSolver::encodeAtMosK_SWC(const std::vector< int >& lits, const int k)
     addClause(temporary_lits, 0);
   }
 
+  if(simplify_debug) std::cout << "constraint (4):" << std::endl;
   // (4) from paper
   for( int i = 1; i < n; ++ i ) {
     if(s[i-1][k-1] == lit_Undef) s[i-1][k-1] = SMaxSolver::toLit(newVar());
@@ -259,6 +269,7 @@ void SMaxSolver::encodeAtMosK_SWC(const std::vector< int >& lits, const int k)
     addClause(temporary_lits, 0);
   }
   
+  if(simplify_debug) std::cout << "constraint (3):" << std::endl;
   // (3) from paper
   temporary_lits.growTo(3);
   for( int i = 1; i + 1 < n; ++i ) {
@@ -387,6 +398,7 @@ MaxSATSolver::ReturnCode SMaxSolver::compute_maxsat(vector< int >& model, uint64
   if (S->getMaxSATFormula() == NULL)
     S->loadFormula(maxsat_formula);
 
+  if(simplify_debug) maxsat_formula->dumpFormula();
 
   S->setSATverbosity(setSATverbosity);
   S->setSATbudget(maxMinimizeSteps);
