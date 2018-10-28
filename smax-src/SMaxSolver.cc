@@ -145,11 +145,11 @@ void SMaxSolver::reserveVars(unsigned int variables)
 
 Var SMaxSolver::newVar()
 {
-  Var v = varCnt;  
   varCnt ++;
   literalPresent.push_back(0);
   literalPresent.push_back(0);
-  return v;
+  if(simplify_debug) std::cout << "use next new variable " << varCnt << std::endl;
+  return varCnt;
 }
 
 void SMaxSolver::addClause(const NSPACE::vec< NSPACE::Lit >& literals, uint64_t weight)
