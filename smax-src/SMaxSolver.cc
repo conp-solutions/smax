@@ -326,7 +326,7 @@ bool SMaxSolver::addAtMostK(const std::vector< int >& literals, unsigned int k)
     if(literal == 0 || abs(literal) > inputVarCnt) return false;
 
   if(k == 0) addNegatedUnits(literals);
-  else if(k == 1) addAtMostOne(literals);
+  else if(k == 1 && literals.size() < 7) addAtMostOne(literals);
   else {
     // TODO switch to built-in PB constraint
     /*
