@@ -12,3 +12,6 @@ depend.mk
 
 # backup files
 *~
+
+# other files
+*.log
