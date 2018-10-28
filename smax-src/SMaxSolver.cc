@@ -389,6 +389,7 @@ MaxSATSolver::ReturnCode SMaxSolver::compute_maxsat(vector< int >& model, uint64
 
 
   S->setSATverbosity(setSATverbosity);
+  S->setSATbudget(maxMinimizeSteps);
   S->search();
   
   StatusCode ret = S->getStatus();
