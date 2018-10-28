@@ -48,6 +48,7 @@ void amotest ()
 
   cout << "cost: " << cost << endl;
 
+  assert (ret == MaxSATSolver::ReturnCode::SATISFIABLE || ret == MaxSATSolver::ReturnCode::OPTIMAL);
   int positive = 0;
   for(int i = 1; i <= 2; ++i)
   {
@@ -56,7 +57,6 @@ void amotest ()
     cout << "v(" << i << ") == " << model[i] << std::endl;
   }
 
-  assert (ret == MaxSATSolver::ReturnCode::SATISFIABLE || ret == MaxSATSolver::ReturnCode::OPTIMAL);
   assert (positive == 1);
   assert (cost == 0);
 }
@@ -111,6 +111,13 @@ void amktest ()
   lits = {-1, -2, -3, -4, -5 , -6, -7, -8, -9, -10, -11, -12};
   maxsat.addAtMostK(lits, 7);
 
+  // assign weights to negative variables
+  for(int variable = 1; variable <= 12; ++ variable)
+  {
+    vector<int> clause;
+    clause.push_back(variable);
+    maxsat.addClause(clause, 13 - variable);
+  }
   std::vector<int> model;
   uint64_t cost = 0;
   MaxSATSolver::ReturnCode ret = maxsat.compute_maxsat(model, cost);
@@ -133,10 +140,65 @@ void amktest ()
       positive ++;
     cout << "v(" << i << ") == " << model[i] << std::endl;
   }
+  cout << "cost: " << cost << endl;
+  
+  for(int i = 1; i <= 5; ++i)
+    assert(model[i] > 0 && "first variables have highest weghts, hence, should be positive");
 
   assert (ret == MaxSATSolver::ReturnCode::SATISFIABLE || ret == MaxSATSolver::ReturnCode::OPTIMAL);
   assert (positive == 5);
-  assert (ret == MaxSATSolver::ReturnCode::SATISFIABLE || cost == 0);
+  assert (ret == MaxSATSolver::ReturnCode::SATISFIABLE || cost == 28);
+}
+
+void amktest_full ()
+{
+  cout << "run AMK full test ..." << endl;
+  vector<int> lits;
+  
+  for(int total = 2; total < 12; ++ total)
+  {
+    for(int positive = 1; positive + 1 < total; ++ positive)
+    {
+      const int negative = total - positive;
+      for(int iteration = 0; iteration < 2; ++ iteration)
+      {
+	MaxSATSolver maxsat(total, 0);
+	vector<int> lits;
+	for(int l = 1; l <= total; ++ l) lits.push_back(l);
+	maxsat.addAtMostK(lits, positive);
+	lits.clear();
+	for(int l = 1; l <= total; ++ l) lits.push_back(-l);
+	maxsat.addAtMostK(lits, total-positive);
+	
+	if(iteration>0) {
+	  // assign weights to negative variables
+	  for(int variable = 1; variable <= total; ++ variable)
+	  {
+	    vector<int> clause;
+	    clause.push_back(-variable);
+	    maxsat.addClause(clause, variable);
+	  }
+	}
+
+	std::vector<int> model;
+	uint64_t cost = 0;
+	MaxSATSolver::ReturnCode ret = maxsat.compute_maxsat(model, cost);
+	cout << "full AMK: total: " << total << " positive: " << positive << " iteartion: " << iteration << " cost: " << cost << " estimate: " << ((positive)*(positive + 1))/2 << " model: ";
+	int positive_count = 0;
+	if(model.size() > 0) {
+	  for(int i = 1; i < (int)model.size(); ++i)
+	  {
+	    cout << " v(" << i << ") == " << model[i];
+	    if( model[i] > 0 ) ++positive_count;
+	  }
+	}
+	cout << endl;
+	assert(positive_count == positive && "hard formula should encode AMK");
+	if(iteration == 1)
+	  assert((int64_t)cost == ((positive)*(positive + 1))/2 && "the cost should match the estimate");
+      }
+    }
+  }
 }
 
 void unsattest ()
@@ -167,7 +229,7 @@ void unsattest ()
   assert (ret == MaxSATSolver::ReturnCode::UNSATISFIABLE);
 }
 
-void maxsattest ()
+void sattest ()
 {
   cout << "run maxsat test ..." << endl;
   vector<int> lits;
@@ -286,21 +348,158 @@ void nomemtest ()
   }
 }
 
+void amktest_limted ()
+{
+  cout << "run AMK (5 out of 12) test with limits ..." << endl;
+  
+  int64_t limits[9] = {-1,1024,64,32,16,8,4,2,1};
+  
+  for(int iteration = 0; iteration < 9; ++ iteration)
+  {
+    int64_t stepLimit = limits[iteration];
+
+    vector<int> lits;
+    MaxSATSolver maxsat(12, 0);
+    lits = {1, 2, 3, 4, 5 , 6, 7, 8,9 , 10, 11, 12};
+    maxsat.addAtMostK(lits, 5);
+    lits = {-1, -2, -3, -4, -5 , -6, -7, -8, -9, -10, -11, -12};
+    maxsat.addAtMostK(lits, 7);
+
+    // assign weights to negative variables
+    for(int variable = 1; variable <= 12; ++ variable)
+    {
+      vector<int> clause;
+      clause.push_back(variable);
+      maxsat.addClause(clause, 13 - variable);
+    }
+    
+    std::vector<int> model;
+    uint64_t cost = 0;
+    cout << endl << "solve with limit: " << stepLimit << endl;
+    MaxSATSolver::ReturnCode ret = maxsat.compute_maxsat(model, cost, UINT64_MAX, 0x0, stepLimit);
+
+    if(ret == MaxSATSolver::ReturnCode::SATISFIABLE)
+	  cout << "satisfiable" << endl;
+    else if(ret == MaxSATSolver::ReturnCode::UNSATISFIABLE)
+	  cout << "unsatisfiable" << endl;
+    else if(ret == MaxSATSolver::ReturnCode::UNKNOWN)
+	  cout << "unknown" << endl;
+    else if(ret == MaxSATSolver::ReturnCode::OPTIMAL)
+	  cout << "optimal" << endl;
+    else
+	  cout << "unspecified (" << (int)ret << ")" << endl;
+
+    if(ret != MaxSATSolver::ReturnCode::UNKNOWN && ret != MaxSATSolver::ReturnCode::ERROR)
+    {
+      int positive = 0;
+      for(int i = 1; i <= 12; ++i)
+      {
+	if(i >= (int)model.size()) continue;
+	if(model[i] > 0)
+	  positive ++;
+	cout << "v(" << i << ") == " << model[i] << std::endl;
+      }
+      assert (ret == MaxSATSolver::ReturnCode::SATISFIABLE || ret == MaxSATSolver::ReturnCode::OPTIMAL);
+      assert (positive == 5);
+      assert (ret == MaxSATSolver::ReturnCode::SATISFIABLE || cost == 28);
+    }
+  }
+}
+
+void maxsat_1_test ()
+{
+  for(int iteration = 0; iteration < 2; ++ iteration)
+  {
+    cout << "run maxsat_1_" << iteration << " test ..." << endl;
+    MaxSATSolver maxsat(12, 0);
+
+    // assign weights to negative variables
+    for(int variable = 1; variable <= 12; ++ variable)
+    {
+      vector<int> clause;
+      clause.push_back(variable);
+      maxsat.addClause(clause, 13 - variable);
+    }
+    
+    // second iteration adds all units as negation
+    if(iteration>0) {
+      for(int variable = 1; variable <= 12; ++ variable)
+      {
+	vector<int> clause;
+	clause.push_back(-variable);
+	maxsat.addClause(clause);
+      }      
+    }
+    
+    std::vector<int> model;
+    uint64_t cost = 0;
+    MaxSATSolver::ReturnCode ret = maxsat.compute_maxsat(model, cost);
+
+    int positive = 0;
+    for(int i = 1; i <= 2; ++i)
+      cout << "v(" << i << ") == " << model[i] << std::endl;
+    cout << "cost: " << cost << endl;
+    
+    if(iteration==0) assert (cost == 0);
+    if(iteration==1) assert (cost == 78);
+  }
+}
+
+void maxsat_2_test ()
+{
+  for(int iteration = 0; iteration < 2; ++ iteration)
+  {
+    cout << "run maxsat_2_" << iteration << " test ..." << endl;
+    MaxSATSolver maxsat(2, 0);
+
+    // assign weights to negative variables
+    maxsat.addClause({-1, -2}, 1);
+    maxsat.addClause({-1, 2}, 1);
+    maxsat.addClause({1, -2}, 1);
+    maxsat.addClause({1, 2}, 1);
+
+    if(iteration==1) {
+      maxsat.addClause({-1, -2}, 0);
+      maxsat.addClause({1, 2}, 0);
+    }
+    
+    std::vector<int> model;
+    uint64_t cost = 0;
+    MaxSATSolver::ReturnCode ret = maxsat.compute_maxsat(model, cost);
+
+    int positive = 0;
+    for(int i = 1; i <= 2; ++i)
+      cout << "v(" << i << ") == " << model[i] << std::endl;
+    cout << "cost: " << cost << endl;
+    
+    if(iteration==0) assert (cost == 1);
+    if(iteration==1) assert (cost == 1);
+  }
+}
+
 int main(int argc, char **argv)
 {
   versiontest ();
+  cout << endl;
+  unsattest ();
+  cout << endl;
+  sattest ();
+  cout << endl;
+  maxsat_1_test ();
+  cout << endl;
+  maxsat_2_test ();
   cout << endl;
   amotest ();
   cout << endl;
   amktest_simple ();
   cout << endl;
+  amktest_full ();
+  cout << endl;
   amktest ();
   cout << endl;
-  unsattest ();
-  cout << endl;
-  maxsattest ();
-  cout << endl;
   invaltest ();
+  cout << endl;
+  amktest_limted();
   cout << endl;
   if(argc==1) {
     nomemtest ();
