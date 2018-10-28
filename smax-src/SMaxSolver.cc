@@ -172,7 +172,7 @@ void SMaxSolver::addClause(const NSPACE::vec< NSPACE::Lit >& literals, uint64_t 
   
   if(weight == 0)
   {
-    maxsat_formula->addHardClause(temporary_lits);
+    maxsat_formula->addHardClause(literals);
   }
   else if (weight > 0)
   {
@@ -181,7 +181,7 @@ void SMaxSolver::addClause(const NSPACE::vec< NSPACE::Lit >& literals, uint64_t 
     // Updates the sum of the weights of soft clauses.
     maxsat_formula->updateSumWeights(weight);
     // Finally add the clause
-    maxsat_formula->addSoftClause(weight, temporary_lits); 
+    maxsat_formula->addSoftClause(weight, literals);
   }
 }
 
