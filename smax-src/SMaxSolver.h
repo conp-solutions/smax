@@ -102,6 +102,8 @@ protected:
     /** stores whether we are actually debugging */
     bool simplify_debug = false;
 
+    /** verbosity of the used SAT solvers */
+    int setSATverbosity = 0;
     
  public:
     // Constructor/Destructor:

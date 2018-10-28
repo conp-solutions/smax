@@ -126,6 +126,7 @@ SMaxSolver::SMaxSolver(const int inputVariables)
 
 #ifndef NDEBUG
   if(!simplify_debug) simplify_debug = getenv("DEBUG_LIBSMAX") != NULL;
+  if(simplify_debug) setSATverbosity = 2;
 #endif
 }
 
@@ -386,6 +387,8 @@ MaxSATSolver::ReturnCode SMaxSolver::compute_maxsat(vector< int >& model, uint64
   if (S->getMaxSATFormula() == NULL)
     S->loadFormula(maxsat_formula);
 
+
+  S->setSATverbosity(setSATverbosity);
   S->search();
   
   StatusCode ret = S->getStatus();
