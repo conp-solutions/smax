@@ -208,10 +208,10 @@ void SMaxSolver::addAtMostOne(const std::vector< int >& literals)
   
   for(unsigned i = 0 ; i < literals.size(); ++ i)
   {
-    temporary_lits[0] = toLit(literals[i]); // -l_i
+    temporary_lits[0] = ~toLit(literals[i]); // -l_i
     for(unsigned j = i+1 ; j < literals.size(); ++ j )
     {
-      temporary_lits[1] = toLit(literals[j]); // -l_j
+      temporary_lits[1] = ~toLit(literals[j]); // -l_j
       addClause(temporary_lits, 0); // add -l_i \lor -l_j
     }
   }
