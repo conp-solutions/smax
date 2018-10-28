@@ -233,8 +233,8 @@ void SMaxSolver::encodeAtMosK_SWC(const std::vector< int >& lits, const int k)
   temporary_lits.growTo(2);
   for( int i = 1; i + 1< n ; ++i ) {
     for( int j = 0; j < k; ++j ) {
-      if( s[i-1][j] == lit_Undef ) s[i-1][j] = toLit(newVar());
-      if( s[i][j] == lit_Undef ) s[i][j] = toLit(newVar());
+      if( s[i-1][j] == lit_Undef ) s[i-1][j] = SMaxSolver::toLit(newVar());
+      if( s[i][j] == lit_Undef ) s[i][j] = SMaxSolver::toLit(newVar());
       temporary_lits[0] = ~s[i-1][j];
       temporary_lits[1] = s[i][j];
       addClause(temporary_lits, 0);
@@ -244,17 +244,17 @@ void SMaxSolver::encodeAtMosK_SWC(const std::vector< int >& lits, const int k)
   // (2) from paper
   for( int i = 0 ; i + 1 < n; ++ i ) {
     const int j = 0;
-    if( s[i][j] == lit_Undef ) s[i][j] = toLit(newVar());
-    temporary_lits[0] = ~toLit(lits[i]);
+    if( s[i][j] == lit_Undef ) s[i][j] = SMaxSolver::toLit(newVar());
+    temporary_lits[0] = ~SMaxSolver::toLit(lits[i]);
     temporary_lits[1] = s[i][j];
     addClause(temporary_lits, 0);
   }
 
   // (4) from paper
   for( int i = 1; i < n; ++ i ) {
-    if(s[i-1][k-1] == lit_Undef) s[i-1][k-1] = toLit(newVar());
+    if(s[i-1][k-1] == lit_Undef) s[i-1][k-1] = SMaxSolver::toLit(newVar());
     temporary_lits[0] = ~s[i-1][k-1];
-    temporary_lits[1] = ~toLit(lits[i]);
+    temporary_lits[1] = ~SMaxSolver::toLit(lits[i]);
     addClause(temporary_lits, 0);
   }
   
@@ -262,10 +262,10 @@ void SMaxSolver::encodeAtMosK_SWC(const std::vector< int >& lits, const int k)
   temporary_lits.growTo(3);
   for( int i = 1; i + 1 < n; ++i ) {
     for( int j = 0; j + 1 < k; ++ j ) {
-      if( s[i-1][j] == lit_Undef ) s[i-1][j] = toLit(newVar());
-      if( s[i][j+1] == lit_Undef ) s[i][j+1] = toLit(newVar());
+      if( s[i-1][j] == lit_Undef ) s[i-1][j] = SMaxSolver::toLit(newVar());
+      if( s[i][j+1] == lit_Undef ) s[i][j+1] = SMaxSolver::toLit(newVar());
       temporary_lits[0] = ~s[i-1][j];
-      temporary_lits[1] = ~toLit(lits[i]);
+      temporary_lits[1] = ~SMaxSolver::toLit(lits[i]);
       temporary_lits[2] = s[i][j+1];
       addClause(temporary_lits, 0);
     }
