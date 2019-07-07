@@ -69,7 +69,7 @@ public:
         ERROR = 4,
     };
 
-    /** This integer represents the version of the MUS interface */
+    /** This integer represents the version of the MaxSAT interface */
     unsigned getVersion () const;
 
     /** This string contains the name of the used backend */
@@ -188,7 +188,7 @@ public:
      * 
      *  Note: the returned model might be different among different
      *        implementations of this function, because it is up to the
-     *        implementation which MUS to report (if multiple are present).
+     *        implementation which solution to report (if multiple are present).
      *
      *  In case the input problem is satisfiable, the variable model will
      *  store the satisfying model, where model[i] stores that truth value for
