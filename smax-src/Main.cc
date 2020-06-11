@@ -176,7 +176,7 @@ int main(int argc, char** argv)
 	// simple stats
 	double cpu_time = cpuTime();
 	double mem_used = memUsedPeak();
-	printf("Stats: Memory : %.2f MB, CPU : %g s\n", mem_used, cpu_time);
+	printf("c Stats: Memory : %.2f MB, CPU : %g s\n", mem_used, cpu_time);
 	
         delete S;
         return retStatus;
