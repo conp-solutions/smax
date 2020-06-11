@@ -5,6 +5,8 @@ CFLAGS    += -flto
 
 CFLAGS     += -Wextra -Wno-unused-parameter
 
+CFLAGS     += -Wno-class-memaccess
+
 # Make sure we do not introduce warnings again
 CFLAGS     += -Wno-literal-suffix -Werror
 
