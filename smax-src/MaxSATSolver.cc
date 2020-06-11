@@ -85,7 +85,7 @@ bool MaxSATSolver::addClause(const std::vector<int> &literals, uint64_t weight)
   {
     // in case of the exception, we assume insufficient memory
     solver->setErrno(-ENOMEM);
-    return ERROR;
+    return false;
   }
 }
 
@@ -105,7 +105,7 @@ bool MaxSATSolver::addAtMostK(const std::vector<int> &literals, const unsigned k
   {
     // in case of the exception, we assume insufficient memory
     solver->setErrno(-ENOMEM);
-    return ERROR;
+    return false;
   }
 }
     
