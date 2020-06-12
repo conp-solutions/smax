@@ -28,6 +28,8 @@ MROOT      = $(PWD)/../open-wbo/solvers/$(SOLVERDIR)
 
 # Set compile and link flags
 CFLAGS     += -I .. -Wall -Wno-parentheses -std=c++11 -DNSPACE=$(NSPACE) -DSOLVERNAME=$(SOLVERNAME) -DVERSION=$(VERSION)
+# Set a flag to identify the used solver during compile time
+CFLAGS     += -DUSE_$(SOLVER)
 LFLAGS     += -lgmpxx -lgmp
 LFLAGS     += -Wall $(EXTRA_LFLAGS) 
 
