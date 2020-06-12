@@ -62,7 +62,7 @@ static IntOption    cardinality          ("SMAX - Open WBO - Encodings", "cardin
                                           "1=totalizer, 2=modulo totalizer).\n",
                                           1, IntRange(0, 2));
 
-
+#ifndef USE_mergesat
 inline std::ostream& operator<<(std::ostream& other, const NSPACE::Lit l)
 {
   if(sign(l)) other << "-";
@@ -91,6 +91,7 @@ inline std::ostream& operator<<(std::ostream& other, const NSPACE::vec<T>& data)
     }
     return other;
 }
+#endif
 
 /** print elements of a std::vector */
 template <typename T>
