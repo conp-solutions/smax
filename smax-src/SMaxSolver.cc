@@ -70,16 +70,6 @@ inline std::ostream& operator<<(std::ostream& other, const NSPACE::Lit l)
   return other;
 }
 
-/** print elements of a std::vector */
-template <typename T>
-inline std::ostream& operator<<(std::ostream& other, const std::vector<T>& data)
-{
-    for (unsigned i = 0 ; i < data.size(); ++ i) {
-        other << " " << data[i];
-    }
-    return other;
-}
-
 
 /** print lbool */
 inline std::ostream& operator<<(std::ostream& other, const NSPACE::lbool& b)
@@ -101,6 +91,17 @@ inline std::ostream& operator<<(std::ostream& other, const NSPACE::vec<T>& data)
     }
     return other;
 }
+
+/** print elements of a std::vector */
+template <typename T>
+inline std::ostream& operator<<(std::ostream& other, const std::vector<T>& data)
+{
+    for (unsigned i = 0 ; i < data.size(); ++ i) {
+        other << " " << data[i];
+    }
+    return other;
+}
+
 
 /** checks the time and might kill the current process with an error */
 static bool checktime ()
