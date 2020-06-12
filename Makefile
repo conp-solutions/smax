@@ -13,3 +13,7 @@ smax:
 clean:
 	cd smax-src; make clean
 	rm -f lib/libsmax.a lib/libsmax.so
+
+.PHONY: test
+test:
+	$(MAKE) -C test
