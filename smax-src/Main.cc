@@ -165,7 +165,7 @@ int main(int argc, char** argv)
 	  for(unsigned index = 1; index < model.size(); ++ index)
 	    printf("%d ", model[index]);
 	  printf("0\n");
-	  retStatus = 10;
+	  retStatus = 30;
 	  break;
 	case MaxSATSolver::ReturnCode::ERROR:
 	default:
