@@ -1,3 +1,3 @@
 [submodule "open-wbo"]
 	path = open-wbo
-	url = https://github.com/sat-group/open-wbo.git
+	url = git@github.com:conp-solutions/open-wbo.git
