@@ -1,0 +1,164 @@
+\documentclass[conference]{IEEEtran}
+% packages
+\usepackage{xspace}
+\usepackage{hyperref}
+\usepackage{todonotes}
+\usepackage{tikz}
+\usepackage{balance}
+\usepackage[utf8]{inputenc}
+\usepackage{alltt}
+
+\def\CC{{C\nolinebreak[4]\hspace{-.05em}\raisebox{.4ex}{\tiny\bf ++}}}
+\def\ea{\,et\,al.\ }
+
+\begin{document}
+    
+% paper title
+\title{SMAX -- Implementing a Robust MaxSAT Interface}
+
+% author names and affiliations
+% use a multiple column layout for up to three different
+% affiliations
+\author{
+\IEEEauthorblockN{Norbert Manthey}
+\IEEEauthorblockA{nmanthey@conp-solutions.com\\Dresden, Germany}
+}
+
+\maketitle
+
+\def\smax{\textsc{smax}\xspace}
+\def\openwbo{\textsc{Open-WBO}\xspace}
+\def\glucose{\textsc{Glucose~4.1}\xspace}
+\def\minisat{\textsc{Minisat~2.2}\xspace}
+\def\mergesat{\textsc{MergeSAT}\xspace}
+
+% the abstract is optional
+%\begin{abstract}
+%\end{abstract}
+
+\section{Introduction}
+
+The main aim of the MaxSAT solver \smax is to showcase how a MaxSAT solver can be used as a library.
+Consequently, it can be understood as a prototype implementation which does not focus on solver performance as the highest priority.
+The solver has to following properties:
+%
+\begin{itemize}
+ \item implement a \CC interface as a library
+ \item be easily consumable, by being available as MIT license
+ \item implement in a robust, modular way
+ \item support reproducable partial solving, based on solving steps.
+\end{itemize}
+%
+The implementation allows to provide the solver as a shared library, which opens the door for integration into tools that require a Python or Java interface.
+Consequently, solver failures and exceptions are caught by the library itself, and errors are handled accordingly.
+Finally, all code is version controlled with git submodules, to allow reproduction of solver binaries or libraries.
+Continuous testing is used to make sure that updated code can be used as solving backend via a shared library, and furthermore checks for errors via valgrind.
+
+\section{Solver Internals}
+
+The idea behind the solver is open to switch solving backends.
+The initial implementation follows an approach that makes software licenses simple, by focussing on software that is available as MIT license.
+
+\subsection{Solver Interface}
+
+The solver implements a \CC interface to a MaxSAT engine.
+The interface is scatched in Figure~\ref{fig:interface}.
+The interface aims at allowing failure inside the solver, as well as providing an assignment to start from and a number of steps to perform, so that partial and \textbf{reproducible} 
+
+\begin{figure*}[t]
+\centering
+\begin{alltt}
+class MaxSATSolver {
+
+    /** Return codes for the caller to compute a MaxSAT solution */
+    enum ReturnCode
+    {
+        UNKNOWN = 0,
+        SATISFIABLE = 1,
+        UNSATISFIABLE = 2,
+        OPTIMAL = 3,
+        ERROR = 4,
+    };
+
+    /** This integer represents the version of the MaxSAT interface */
+    unsigned getVersion () const;
+
+    /** This string contains the name of the used backend */
+    const char* getSolverName () const;
+
+    /** Initialize the MaxSAT solver for a given formula */
+    MaxSATSolver(int nVars, int nClausesEstimate = 8192);
+    
+    /** A call to this method frees all resources of the solver. */
+    ~MaxSATSolver();
+
+    /** Return error number code in case the last call to another method failed */
+    int getErrno() const;
+
+    /** Add a clause to the solver */
+    bool addClause(const std::vector<int> &literals, uint64_t weight = 0);
+    
+    /** Add an at-most-k constraint to the solver */
+    bool addAtMostK(const std::vector<int> &literals, const unsigned k);
+    
+    /** Compute a MaxSAT solution for the added (weighted) formula */
+    ReturnCode compute_maxsat(std::vector<int> &model,
+                              uint64_t &cost,
+                              uint64_t maxCost = UINT64_MAX,
+                              const std::vector<int> *startAssignment = 0,
+                              int64_t maxMinimizeSteps = -1);
+}
+
+\end{alltt}
+\caption{This figure briefly summaries the interface that is offered to the MaxSAT solver backend implementation.
+A well documented version of this file can be found at \url{https://github.com/conp-solutions/smax/blob/master/include/MaxSATSolver.h}.}\label{fig:interface}
+\end{figure*}
+
+\subsection{MaxSAT Solvers}
+
+The solver uses \openwbo~\cite{martins-sat14} as the current MaxSAT backend, which is an open source MaxSAT solver that supports several MaxSAT algorithms~\cite{manquinho-sat09,wmsu3-corr07,martins-cp14,martins-ecai12,martins-sat13,morgado-cp14,neves-sat15} and SAT solvers~\cite{minisat-sat03,audemard-ijcai09,mergesat}.
+To make sure all used code is available under MIT license, the \glucose code of the \openwbo package had to be removed.
+
+The used \openwbo version is an older version, as initial changes have been added early and rebasing them to a current version has not been considered yet.
+Consequently, eventual bug fixes might be currently missing in \smax.
+Furthermore, additional patches had to be added to \openwbo to allow pragmatic access to internal data structures like the found bound or the last model to be handled internally.
+Some part of \smax basically provides an input parser and an output generator based on the available data structures of \openwbo, with the additional abstraction layer in between.
+
+We currently use a single, predefined, configuration of \openwbo to simplify the interface to the MaxSAT library.
+
+\subsection{SAT Solvers}
+
+\openwbo is based on the data structures of \minisat~\cite{minisat-sat03,MiniSat:github}.
+Therefore, solvers based on \minisat can be used as a potential back-end solvers.
+
+\mergesat~\cite{mergesat} is a CDCL solver based on the SAT competition winner of 2018, \textsc{MapleLCMDistChronoBT}~\cite{chronobt}.
+While being based on \minisat, \mergesat aims at providing recent solving techniques while being compatible with the solver API of \minisat.
+Among others, \mergesat implements partial backtracking, an efficient version of learned clause minimization, as well as inprocessing based on subsumption and self-subsuming resolution.
+Comparesed to \textsc{MapleLCMDistChronoBT}, the incremental search feature has to been enabled again.
+
+\subsection{Competition Tracks}
+
+The solver has been submitted to the complete tracks of the competition only, although the implementation supports partial solving.
+However, the current implementation does not support to forward a signal from the solver wrapper into the solver to obtain the currently best known solution.
+Furthermore, support for Top-K has not been integrated yet, also because the used \openwbo version does not support this feature.
+
+Two variants of the solver have been submitted.
+The only difference is the SAT backend, namely \minisat and \mergesat.
+The reason to submit these two solvers is to show the performance difference when using a more recent SAT backend.
+
+\section{Availability}
+
+The solver \smax is available under a MIT license in GitHub at \url{https://github.com/conp-solutions/smax}.
+The repository is setup to briefly check new changes with continuous integration tests.
+
+\section*{Acknowledgments}
+
+The current solver uses \openwbo as a backend engine, and is heavily based on that solver.
+Hence, the contibutors of that solver own a large part of this tool: Ruben Martins, as well as Miguel Terra-Neves, Vasco Manquinho and In\^es Lynce.
+Additionally, we would like to thank all the collaborators on previous versions of \openwbo, namely Saurabh Joshi and Mikol{\'a}{\v{s}} Janota. 
+
+\balance
+\bibliographystyle{IEEEtran}
+\bibliography{smax}
+
+\end{document}
