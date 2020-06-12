@@ -425,11 +425,16 @@ MaxSATSolver::ReturnCode SMaxSolver::compute_maxsat(vector< int >& model, uint64
       return MaxSATSolver::ReturnCode::ERROR;
     case _SATISFIABLE_:
       cost = S->getLastBound();
-      model.resize(inputVarCnt + 1, 0);
-      for(Var v = 0; v < inputVarCnt; ++ v)
-	model[v+1] = S->getValue(v);
-      delete S; S = nullptr;
-      return MaxSATSolver::ReturnCode::SATISFIABLE;
+      if(maxCost < cost) {
+          delete S; S = nullptr;
+          return MaxSATSolver::ReturnCode::UNKNOWN;
+      } else {
+          model.resize(inputVarCnt + 1, 0);
+          for(Var v = 0; v < inputVarCnt; ++ v)
+              model[v+1] = S->getValue(v);
+          delete S; S = nullptr;
+          return MaxSATSolver::ReturnCode::SATISFIABLE;
+      }
     case _OPTIMUM_:
       if(maxCost < cost) {
           delete S; S = nullptr;
