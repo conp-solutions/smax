@@ -120,17 +120,14 @@ protected:
     // Problem specification:
     //
     NSPACE::Var newVar(); // Add a new variable.
-    int     newGroup  (); // Add a new group.
     void    reserveVars(unsigned variables); // Reserve space for most of the structures that are used per variable
     
-    int     nVars      ()      const {return varCnt;};         // The current number of variables.
+    int     nVars      ()      const {return varCnt;}         // The current number of variables.
     void    interrupt() {};          // Trigger a (potentially asynchronous) interruption of the solver.
 
     // For error handling
     int getErrno() const { return lastErrno; }
     void setErrno(const int errorNumber) { lastErrno = errorNumber; }
-
-
 
     /** add a clause, weight == 0 means it's a hard clause */
     bool addClause(const std::vector< int >& literals, uint64_t weight);
