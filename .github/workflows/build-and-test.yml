@@ -1,0 +1,28 @@
+name: Build and Test on Linux and Mac OS
+
+on: [push]
+
+jobs:
+  Linux:
+
+    runs-on: ubuntu-18.04
+
+    steps:
+    - name: Install Packages
+      run: sudo apt-get install timeout clasp valgrind
+
+    - uses: actions/checkout@v2
+      with:
+        submodules: recursive
+
+    - name: minisat build
+      run: make all SOLVER=minisat
+
+    - name: clean build
+      run: make clean SOLVER=minisat
+
+    - name: mergesat build
+      run: make all
+
+    - name: test tool
+      run: make test
