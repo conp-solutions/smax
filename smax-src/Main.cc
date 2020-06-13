@@ -63,10 +63,13 @@ static void SIGINT_exit(int signum) {
 //=================================================================================================
 // Main:
 
+#define VER1_(x) #x
+#define VER_(x) VER1_(x)
+#define SATVER VER_(SOLVERNAME)
 int main(int argc, char** argv)
 {
 
-      printf("c\nc This is smax -- based on MiniSAT\nc\n");
+      printf("c\nc This is smax -- based on %s\nc\n", SATVER);
       
       setUsageHelp("c USAGE: %s [options] <input-file> <result-output-file>\n\n  where input may be either in plain or gzipped GDIMACS.\n");
         
