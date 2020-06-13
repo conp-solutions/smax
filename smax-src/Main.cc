@@ -37,6 +37,8 @@ OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWA
 
 #include "smax-src/WDimacs.h"
 
+#include <sstream>
+
 using namespace SMax;
 using namespace NSPACE;
 
@@ -145,6 +147,7 @@ int main(int argc, char** argv)
 	if(verb>0) printf("c return from search with status %d, and model size %lu\n", maxsat_ret, model.size());
 
 	int retStatus = 0;
+    std::stringstream model_string;
 	switch(maxsat_ret) {
 	case MaxSATSolver::ReturnCode::UNSATISFIABLE:
 	  printf("s UNSATISFIABLE\n");
@@ -168,11 +171,11 @@ int main(int argc, char** argv)
 	  }
 	  
 	  /* print model */
-	  printf("v ");
+	  model_string << "v ";
 	  for(unsigned index = 1; index < model.size(); ++ index)
-	    printf("%d ", model[index]);
-	  printf("0\n");
-	  retStatus = 30;
+	    model_string << model[index] << " ";
+	  model_string << "0";
+	  printf("%s\n", model_string.str().c_str());
 	  break;
 	case MaxSATSolver::ReturnCode::ERROR:
 	default:
