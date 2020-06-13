@@ -46,13 +46,14 @@ The solver has to following properties:
  \item implement a \CC interface as a library
  \item be easily consumable, by being available as MIT license
  \item implement in a robust, modular way
- \item support reproducable partial solving, based on solving steps.
+ \item support reproducible partial solving, based on solving steps.
 \end{itemize}
 %
 The implementation allows to provide the solver as a shared library, which opens the door for integration into tools that require a Python or Java interface.
 Consequently, solver failures and exceptions are caught by the library itself, and errors are handled accordingly.
-Finally, all code is version controlled with git submodules, to allow reproduction of solver binaries or libraries.
+All code is version controlled with git submodules, to allow reproduction of solver binaries or libraries.
 Continuous testing is used to make sure that updated code can be used as solving backend via a shared library, and furthermore checks for errors via valgrind.
+Finally, a Maxsat fuzzer\footnote{The fuzzer is available at \url{https://github.com/conp-solutions/maxsat-fuzzer.git}.} is used to test whether random input behaves as expected.
 
 \section{Solver Internals}
 
@@ -62,8 +63,9 @@ The initial implementation follows an approach that makes software licenses simp
 \subsection{Solver Interface}
 
 The solver implements a \CC interface to a MaxSAT engine.
-The interface is scatched in Figure~\ref{fig:interface}.
-The interface aims at allowing failure inside the solver, as well as providing an assignment to start from and a number of steps to perform, so that partial and \textbf{reproducible} 
+The interface is sketched in Figure~\ref{fig:interface}.
+The interface aims at allowing failure inside the solver, as well as providing an assignment to start from and a number of steps to perform, so that partial and reproducible solver calls are possible.
+Discussions on the interface are welcome.
 
 \begin{figure*}[t]
 \centering
@@ -116,7 +118,7 @@ A well documented version of this file can be found at \url{https://github.com/c
 
 \subsection{MaxSAT Solvers}
 
-The solver uses \openwbo~\cite{martins-sat14} as the current MaxSAT backend, which is an open source MaxSAT solver that supports several MaxSAT algorithms~\cite{manquinho-sat09,wmsu3-corr07,martins-cp14,martins-ecai12,martins-sat13,morgado-cp14,neves-sat15} and SAT solvers~\cite{minisat-sat03,audemard-ijcai09,mergesat}.
+The solver uses \openwbo~\cite{martins-sat14} as the current MaxSAT backend, which is an open source MaxSAT solver that supports several MaxSAT algorithms and SAT solvers~\cite{minisat-sat03,audemard-ijcai09,mergesat}.
 To make sure all used code is available under MIT license, the \glucose code of the \openwbo package had to be removed.
 
 The used \openwbo version is an older version, as initial changes have been added early and rebasing them to a current version has not been considered yet.
@@ -134,7 +136,7 @@ Therefore, solvers based on \minisat can be used as a potential back-end solvers
 \mergesat~\cite{mergesat} is a CDCL solver based on the SAT competition winner of 2018, \textsc{MapleLCMDistChronoBT}~\cite{chronobt}.
 While being based on \minisat, \mergesat aims at providing recent solving techniques while being compatible with the solver API of \minisat.
 Among others, \mergesat implements partial backtracking, an efficient version of learned clause minimization, as well as inprocessing based on subsumption and self-subsuming resolution.
-Comparesed to \textsc{MapleLCMDistChronoBT}, the incremental search feature has to been enabled again.
+Compared to \textsc{MapleLCMDistChronoBT}, the incremental search feature has to been enabled again.
 
 \subsection{Competition Tracks}
 
@@ -149,12 +151,12 @@ The reason to submit these two solvers is to show the performance difference whe
 \section{Availability}
 
 The solver \smax is available under a MIT license in GitHub at \url{https://github.com/conp-solutions/smax}.
-The repository is setup to briefly check new changes with continuous integration tests.
+The repository is setup to briefly check new changes with continuous integration.
 
 \section*{Acknowledgments}
 
 The current solver uses \openwbo as a backend engine, and is heavily based on that solver.
-Hence, the contibutors of that solver own a large part of this tool: Ruben Martins, as well as Miguel Terra-Neves, Vasco Manquinho and In\^es Lynce.
+Hence, the contributors of that solver own a large part of this tool: Ruben Martins, as well as Miguel Terra-Neves, Vasco Manquinho and In\^es Lynce.
 Additionally, we would like to thank all the collaborators on previous versions of \openwbo, namely Saurabh Joshi and Mikol{\'a}{\v{s}} Janota. 
 
 \balance
