@@ -152,13 +152,20 @@ int main(int argc, char** argv)
 	  break;
 	case MaxSATSolver::ReturnCode::OPTIMAL:
 	case MaxSATSolver::ReturnCode::UNKNOWN:
+	case MaxSATSolver::ReturnCode::SATISFIABLE:
 	  if(maxsat_ret == MaxSATSolver::ReturnCode::UNKNOWN && model.size() == 0) {
 	    printf("s UNKNOWN\n");
 	    break;
 	  }
 	  /* print S line */
-	  if(maxsat_ret == MaxSATSolver::ReturnCode::OPTIMAL) printf("s OPTIMAL\no %" PRIu64 "\n", cost);
-	  else printf("s SATISFIABLE\n"); /* even if unknown, as we already found a model */
+	  if(maxsat_ret == MaxSATSolver::ReturnCode::OPTIMAL) {
+	      printf("s OPTIMUM FOUND\no %" PRIu64 "\n", cost);
+	      retStatus = 30;
+	  }
+	  else if(maxsat_ret == MaxSATSolver::ReturnCode::SATISFIABLE) {
+	      printf("s SATISFIABLE\n"); /* even if unknown, as we already found a model */
+	      retStatus = 10;
+	  }
 	  
 	  /* print model */
 	  printf("v ");
