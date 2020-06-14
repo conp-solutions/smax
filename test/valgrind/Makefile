@@ -1,2 +1,5 @@
 test:
 	./run.sh
+
+clean:
+
