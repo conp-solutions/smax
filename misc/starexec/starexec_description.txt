@@ -1,0 +1,3 @@
+This package ships the smax MaxSAT solver.
+
+The current version of the code can be found on github.
