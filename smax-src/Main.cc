@@ -174,10 +174,9 @@ int main(int argc, char** argv)
 	  }
 	  
 	  /* print model */
-	  model_string << "v ";
+	  model_string << "v";
 	  for(unsigned index = 1; index < model.size(); ++ index)
-	    model_string << model[index] << " ";
-	  model_string << "0";
+	    model_string << " " << model[index];
 	  printf("%s\n", model_string.str().c_str());
 	  break;
 	case MaxSATSolver::ReturnCode::ERROR:
